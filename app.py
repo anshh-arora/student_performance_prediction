@@ -10,9 +10,7 @@ import os
 # Load environment variables from .env file
 load_dotenv()
 
-import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Suppresses INFO and WARNING messages
-
 
 app = Flask(__name__)
 
@@ -44,16 +42,17 @@ def index():
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
-        # Log the incoming form data
-        print("Received form data:", request.form)
+        # Log the incoming data
+        print("Received data:", request.json)
 
-        # Retrieve form data
-        name = request.form['name']
-        age = int(request.form['age'])
-        year1_marks = float(request.form['year1_marks'])
-        year2_marks = float(request.form['year2_marks'])
-        studytime = float(request.form['study_time'])
-        failures = int(request.form['failures'])
+        # Retrieve JSON data
+        data = request.json
+        name = data['name']
+        age = int(data['age'])
+        year1_marks = float(data['year1_marks'])
+        year2_marks = float(data['year2_marks'])
+        studytime = float(data['study_time'])
+        failures = int(data['failures'])
 
         # Predict final marks
         prediction = predict_new_input(model, scaler, age, year1_marks, year2_marks, studytime, failures)
@@ -82,4 +81,5 @@ def predict():
         return jsonify({'error': 'Internal server error.'}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
