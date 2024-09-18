@@ -10,11 +10,11 @@ import os
 # Load environment variables from .env file
 load_dotenv()
 
-import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Suppresses INFO and WARNING messages
-
-
+# Initialize Flask application
 app = Flask(__name__)
+
+# Set TensorFlow logging level to suppress unnecessary messages
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Suppresses INFO and WARNING messages
 
 # Load the trained model and scaler
 model = load_model('final_marks_predictor_model.h5')
@@ -44,29 +44,23 @@ def index():
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
-        # Log the incoming form data
-        print("Received form data:", request.form)
-
         # Retrieve form data
-        name = request.form['name']
-        age = int(request.form['age'])
-        year1_marks = float(request.form['year1_marks'])
-        year2_marks = float(request.form['year2_marks'])
-        studytime = float(request.form['study_time'])
-        failures = int(request.form['failures'])
+        data = request.json
+        name = data.get('name')
+        age = int(data.get('age'))
+        year1_marks = float(data.get('year1_marks'))
+        year2_marks = float(data.get('year2_marks'))
+        studytime = float(data.get('study_time'))
+        failures = int(data.get('failures'))
 
         # Predict final marks
         prediction = predict_new_input(model, scaler, age, year1_marks, year2_marks, studytime, failures)
 
         if prediction is None:
-            print("Prediction returned None.")
-            return jsonify({'error': 'Prediction failed due to internal error.'}), 500
+            raise ValueError('Prediction failed due to internal error.')
         
         # Round the prediction to 2 decimal places
         rounded_prediction = round(float(prediction), 2)
-        
-        # Log the prediction result
-        print(f"Prediction result: {rounded_prediction}")
 
         # Return the result as a JSON response
         return jsonify({'prediction': rounded_prediction})
