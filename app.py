@@ -10,6 +10,10 @@ import os
 # Load environment variables from .env file
 load_dotenv()
 
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Suppresses INFO and WARNING messages
+
+
 app = Flask(__name__)
 
 # Load the trained model and scaler
