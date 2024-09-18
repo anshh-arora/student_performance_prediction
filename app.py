@@ -3,8 +3,6 @@ import numpy as np
 import pandas as pd
 from tensorflow.keras.models import load_model
 import pickle
-import mysql.connector
-from mysql.connector import Error
 from datetime import datetime
 from dotenv import load_dotenv
 import os
@@ -18,48 +16,6 @@ app = Flask(__name__)
 model = load_model('final_marks_predictor_model.h5')
 with open('scaler.pkl', 'rb') as f:
     scaler = pickle.load(f)
-
-# Database configuration from environment variables
-db_config = {
-    'host': os.getenv('DB_HOST'),
-    'user': os.getenv('DB_USER'),
-    'password': os.getenv('DB_PASSWORD'),
-    'database': os.getenv('DB_NAME')
-}
-
-def get_db_connection():
-    try:
-        connection = mysql.connector.connect(**db_config)
-        if connection.is_connected():
-            return connection
-    except Error as e:
-        print(f"Error while connecting to MySQL: {e}")
-        return None
-
-def init_db():
-    conn = get_db_connection()
-    if conn is not None:
-        try:
-            cursor = conn.cursor()
-            cursor.execute('''CREATE TABLE IF NOT EXISTS student_prediction_data
-                            (id INT AUTO_INCREMENT PRIMARY KEY,
-                             name VARCHAR(255),
-                             age INT,
-                             year1_marks FLOAT,
-                             year2_marks FLOAT,
-                             study_time FLOAT,
-                             failures INT,
-                             predicted_score FLOAT,
-                             timestamp DATETIME)''')
-            conn.commit()
-        except Error as e:
-            print(f"Error creating table: {e}")
-        finally:
-            if conn.is_connected():
-                cursor.close()
-                conn.close()
-
-init_db()
 
 def predict_new_input(model, scaler, age, year1_marks, year2_marks, studytime, failures):
     try:
@@ -107,24 +63,6 @@ def predict():
         
         # Log the prediction result
         print(f"Prediction result: {rounded_prediction}")
-
-        # Store data in the database
-        conn = get_db_connection()
-        if conn is not None:
-            try:
-                cursor = conn.cursor()
-                cursor.execute('''INSERT INTO student_prediction_data 
-                                (name, age, year1_marks, year2_marks, study_time, failures, predicted_score, timestamp)
-                                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)''',
-                               (name, age, year1_marks, year2_marks, studytime, failures, rounded_prediction, datetime.now()))
-                conn.commit()
-            except Error as e:
-                print(f"Error inserting data: {e}")
-                return jsonify({'error': 'Database error occurred.'}), 500
-            finally:
-                if conn.is_connected():
-                    cursor.close()
-                    conn.close()
 
         # Return the result as a JSON response
         return jsonify({'prediction': rounded_prediction})
