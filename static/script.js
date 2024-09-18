@@ -21,12 +21,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(formObject)
             });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
             const data = await response.json();
-            console.log('Response data:', data);  // Log the response data
+
+            if (!response.ok) {
+                throw new Error(data.error || `HTTP error! status: ${response.status}`);
+            }
 
             if (data.prediction !== undefined) {
                 resultElement.textContent = `Prediction: ${data.prediction}`;
