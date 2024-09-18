@@ -4,13 +4,7 @@ import pandas as pd
 from tensorflow.keras.models import load_model
 import pickle
 from datetime import datetime
-from dotenv import load_dotenv
 import os
-
-# Load environment variables from .env file
-load_dotenv()
-
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Suppresses INFO and WARNING messages
 
 app = Flask(__name__)
 
@@ -68,8 +62,10 @@ def predict():
         print(f"Prediction result: {rounded_prediction}")
 
         # Return the result as a JSON response
-        return jsonify({'prediction': rounded_prediction})
-    
+        response = jsonify({'prediction': rounded_prediction})
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
     except KeyError as ke:
         print(f"KeyError: {ke}")
         return jsonify({'error': f'Missing required field: {ke}'}), 400
@@ -77,7 +73,7 @@ def predict():
         print(f"ValueError: {ve}")
         return jsonify({'error': 'Invalid input. Please ensure all fields contain correct values.'}), 400
     except Exception as e:
-        print(f"Error during form submission: {e}")
+        print(f"Error during prediction: {e}")
         return jsonify({'error': 'Internal server error.'}), 500
 
 if __name__ == '__main__':
