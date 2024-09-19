@@ -1,0 +1,6 @@
+2024-09-19 14:43:06,101 - app - INFO - Model and scaler loaded successfully
+2024-09-19 14:43:09,788 - app - INFO - Model and scaler loaded successfully
+2024-09-19 14:43:18,889 - app - INFO - Index page requested
+2024-09-19 14:43:30,903 - app - INFO - Received data: {'name': 'ansh', 'age': '17', 'year1_marks': '43', 'year2_marks': '64', 'study_time': '6', 'failures': '3'}
+2024-09-19 14:43:31,801 - app - INFO - Prediction successful: 55.20787048339844
+2024-09-19 14:43:31,803 - app - INFO - Prediction result: 55.21
