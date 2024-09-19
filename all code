@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Performance Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div id="title">
+        <h1>Student Performance Prediction</h1>
+    </div>
+    <div id="form">
+        <div id="form-container">
+            <form id="prediction-form" method="post" action="/predict">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" autocomplete="name" required>
+                <br>
+
+                <label for="age">Age:</label>
+                <input type="number" id="age" name="age" autocomplete="age" min="17" max="30" required>
+                <br>
+
+                <label for="year1_marks">First Year Marks:</label>
+                <input type="number" id="year1_marks" name="year1_marks" min="0" max="100" autocomplete="year1_marks" required>
+                <br>
+
+                <label for="year2_marks">Second Year Marks:</label>
+                <input type="number" id="year2_marks" name="year2_marks" min="0" max="100" autocomplete="year2_marks" required>
+                <br>
+
+                <label for="study_time">Study Time (hours):</label>
+                <input type="number" id="study_time" name="study_time" min="0" max="18" autocomplete="study_time" required>
+                <br>
+
+                <label for="failures">Number of Failures:</label>
+                <input type="number" id="failures" name="failures" min="0" max="5" autocomplete="failures" required>
+                <br>
+
+                <button type="submit" id="submit-button">Predict</button>
+
+                <!-- Display Prediction Result -->
+                <div id="result">
+                    <p id="prediction-result"></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
+/* Base Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Title Styling */
+#title {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+#title h1 {
+    font-size: 2rem;
+}
+
+/* Form Container */
+#form {
+    display: flex;
+    justify-content: center;
+}
+
+#form-container {
+    background-color: #fff;
+    padding: 20px 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    width: 100%;
+}
+
+/* Form Element Styling */
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: bold;
+}
+
+input[type="text"], input[type="number"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus, input[type="number"]:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* Button Styling */
+#submit-button {
+    width: 100%;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#submit-button:hover {
+    background-color: #0056b3;
+}
+
+/* Result Styling */
+#result {
+    margin-top: 20px;
+    text-align: center;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 480px) {
+    #form-container {
+        padding: 15px;
+    }
+
+    #title h1 {
+        font-size: 1.5rem;
+    }
+
+    input[type="text"], input[type="number"], #submit-button {
+        font-size: 0.9rem;
+    }
+
+    #submit-button {
+        padding: 8px;
+    }
+}
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('prediction-form');
+    const resultElement = document.getElementById('prediction-result');
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const formData = new FormData(form);
+
+        // Convert FormData to a plain object
+        const formObject = {};
+        formData.forEach((value, key) => {
+            formObject[key] = value;
+        });
+
+        try {
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formObject)
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || `HTTP error! status: ${response.status}`);
+            }
+
+            if (data.prediction !== undefined) {
+                resultElement.textContent = `Prediction: ${data.prediction}`;
+            } else {
+                resultElement.textContent = `Error: ${data.error || 'No prediction available'}`;
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            resultElement.textContent = `Error: ${error.message}`;
+        }
+    });
+});
+
+from flask import Flask, render_template, request, jsonify
+import numpy as np
+import pandas as pd
+from tensorflow.keras.models import load_model
+import pickle
+from datetime import datetime
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Suppresses INFO and WARNING messages
+
+app = Flask(__name__)
+
+# Load the trained model and scaler
+model = load_model('final_marks_predictor_model.h5')
+with open('scaler.pkl', 'rb') as f:
+    scaler = pickle.load(f)
+
+def predict_new_input(model, scaler, age, year1_marks, year2_marks, studytime, failures):
+    try:
+        new_input = pd.DataFrame({
+            'age': [age],
+            'year1_marks': [year1_marks],
+            'year2_marks': [year2_marks],
+            'studytime': [studytime],
+            'failures': [failures]
+        })
+        new_input_scaled = scaler.transform(new_input)
+        predicted_marks = model.predict(new_input_scaled)
+        return predicted_marks[0][0]
+    except Exception as e:
+        print(f"Error during prediction: {e}")
+        return None
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    try:
+        # Log the incoming data
+        print("Received data:", request.json)
+
+        # Retrieve JSON data
+        data = request.json
+        name = data['name']
+        age = int(data['age'])
+        year1_marks = float(data['year1_marks'])
+        year2_marks = float(data['year2_marks'])
+        studytime = float(data['study_time'])
+        failures = int(data['failures'])
+
+        # Predict final marks
+        prediction = predict_new_input(model, scaler, age, year1_marks, year2_marks, studytime, failures)
+
+        if prediction is None:
+            print("Prediction returned None.")
+            return jsonify({'error': 'Prediction failed due to internal error.'}), 500
+        
+        # Round the prediction to 2 decimal places
+        rounded_prediction = round(float(prediction), 2)
+        
+        # Log the prediction result
+        print(f"Prediction result: {rounded_prediction}")
+
+        # Return the result as a JSON response
+        return jsonify({'prediction': rounded_prediction})
+    
+    except KeyError as ke:
+        print(f"KeyError: {ke}")
+        return jsonify({'error': f'Missing required field: {ke}'}), 400
+    except ValueError as ve:
+        print(f"ValueError: {ve}")
+        return jsonify({'error': 'Invalid input. Please ensure all fields contain correct values.'}), 400
+    except Exception as e:
+        print(f"Error during form submission: {e}")
+        return jsonify({'error': 'Internal server error.'}), 500
+
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
