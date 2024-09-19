@@ -21,16 +21,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(formObject)
             });
 
-            const data = await response.json();
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                const data = await response.json();
 
-            if (!response.ok) {
-                throw new Error(data.error || `HTTP error! status: ${response.status}`);
-            }
+                if (!response.ok) {
+                    throw new Error(data.error || `HTTP error! status: ${response.status}`);
+                }
 
-            if (data.prediction !== undefined) {
-                resultElement.textContent = `Prediction: ${data.prediction}`;
+                if (data.prediction !== undefined) {
+                    resultElement.textContent = `Prediction: ${data.prediction}`;
+                } else {
+                    resultElement.textContent = `Error: ${data.error || 'No prediction available'}`;
+                }
             } else {
-                resultElement.textContent = `Error: ${data.error || 'No prediction available'}`;
+                console.error("Received non-JSON response:", await response.text());
+                throw new Error("Received non-JSON response from server");
             }
         } catch (error) {
             console.error("Error:", error);

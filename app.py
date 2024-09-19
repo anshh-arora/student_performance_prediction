@@ -1,8 +1,8 @@
-import os
-import logging
-from logging.handlers import RotatingFileHandler
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
+import logging
+from logging.handlers import RotatingFileHandler
+import os
 import numpy as np
 import pandas as pd
 from tensorflow.keras.models import load_model
@@ -13,14 +13,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 handler = RotatingFileHandler('app.log', maxBytes=10000, backupCount=1)
-handler.setLevel(logging.INFO)
+handler.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)
-
-# Suppress TensorFlow warnings
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 app = Flask(__name__)
 CORS(app)
@@ -54,7 +51,6 @@ def predict_new_input(model, scaler, age, year1_marks, year2_marks, studytime, f
 
 @app.route('/')
 def index():
-    app.logger.info("Index page requested")
     return render_template('index.html')
 
 @app.route('/predict', methods=['POST'])
@@ -62,12 +58,15 @@ def predict():
     try:
         app.logger.info(f"Received data: {request.json}")
         data = request.json
-        name = data['name']
-        age = int(data['age'])
-        year1_marks = float(data['year1_marks'])
-        year2_marks = float(data['year2_marks'])
-        studytime = float(data['study_time'])
-        failures = int(data['failures'])
+        if not data:
+            return jsonify({'error': 'No JSON data received'}), 400
+
+        name = data.get('name')
+        age = int(data.get('age', 0))
+        year1_marks = float(data.get('year1_marks', 0))
+        year2_marks = float(data.get('year2_marks', 0))
+        studytime = float(data.get('study_time', 0))
+        failures = int(data.get('failures', 0))
 
         prediction = predict_new_input(model, scaler, age, year1_marks, year2_marks, studytime, failures)
 
@@ -91,8 +90,4 @@ def predict():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=False)
-
-
-
-    
+    app.run(host='0.0.0.0', port=port, debug=True)
