@@ -21,14 +21,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(formObject)
             });
 
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
             const contentType = response.headers.get("content-type");
             if (contentType && contentType.indexOf("application/json") !== -1) {
                 const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.error || `HTTP error! status: ${response.status}`);
-                }
-
                 if (data.prediction !== undefined) {
                     resultElement.textContent = `Prediction: ${data.prediction}`;
                 } else {
