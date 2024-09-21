@@ -14,23 +14,26 @@ load_dotenv()
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 handler = RotatingFileHandler('app.log', maxBytes=10000, backupCount=1)
 handler.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)
+logger.addHandler(handler)
+
+logger.info("Starting application...")
 
 app = Flask(__name__)
 CORS(app)
-app.logger.addHandler(handler)
 
 # Load the trained model and scaler
 try:
     model = load_model('final_marks_predictor_model.h5')
     with open('scaler.pkl', 'rb') as f:
         scaler = pickle.load(f)
-    app.logger.info("Model and scaler loaded successfully")
+    logger.info("Model and scaler loaded successfully")
 except Exception as e:
-    app.logger.error(f"Error loading model or scaler: {e}")
+    logger.error(f"Error loading model or scaler: {e}")
 
 def predict_new_input(model, scaler, age, year1_marks, year2_marks, studytime, failures):
     try:
@@ -43,10 +46,10 @@ def predict_new_input(model, scaler, age, year1_marks, year2_marks, studytime, f
         })
         new_input_scaled = scaler.transform(new_input)
         predicted_marks = model.predict(new_input_scaled)
-        app.logger.info(f"Prediction successful: {predicted_marks[0][0]}")
+        logger.info(f"Prediction successful: {predicted_marks[0][0]}")
         return predicted_marks[0][0]
     except Exception as e:
-        app.logger.error(f"Error during prediction: {e}")
+        logger.error(f"Error during prediction: {e}")
         return None
 
 @app.route('/')
@@ -56,7 +59,7 @@ def index():
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
-        app.logger.info(f"Received data: {request.json}")
+        logger.info(f"Received data: {request.json}")
         data = request.json
         if not data:
             return jsonify({'error': 'No JSON data received'}), 400
@@ -71,23 +74,26 @@ def predict():
         prediction = predict_new_input(model, scaler, age, year1_marks, year2_marks, studytime, failures)
 
         if prediction is None:
-            app.logger.error("Prediction returned None.")
+            logger.error("Prediction returned None.")
             return jsonify({'error': 'Prediction failed due to internal error.'}), 500
         
         rounded_prediction = round(float(prediction), 2)
-        app.logger.info(f"Prediction result: {rounded_prediction}")
+        logger.info(f"Prediction result: {rounded_prediction}")
         return jsonify({'prediction': rounded_prediction})
     
     except KeyError as ke:
-        app.logger.error(f"KeyError: {ke}")
+        logger.error(f"KeyError: {ke}")
         return jsonify({'error': f'Missing required field: {ke}'}), 400
     except ValueError as ve:
-        app.logger.error(f"ValueError: {ve}")
+        logger.error(f"ValueError: {ve}")
         return jsonify({'error': 'Invalid input. Please ensure all fields contain correct values.'}), 400
     except Exception as e:
-        app.logger.error(f"Error during form submission: {e}", exc_info=True)
+        logger.error(f"Error during form submission: {e}", exc_info=True)
         return jsonify({'error': 'Internal server error.'}), 500
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
+    logger.info(f"Flask app starting on port {port}")
     app.run(host='0.0.0.0', port=port, debug=True)
+
+logger.info("Application shutdown")
