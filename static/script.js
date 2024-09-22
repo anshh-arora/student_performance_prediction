@@ -1,45 +1,32 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('prediction-form');
-    const resultElement = document.getElementById('prediction-result');
+    const resultDiv = document.getElementById('result');
+    const resultText = document.getElementById('prediction-result');
 
-    form.addEventListener('submit', async (event) => {
+    form.addEventListener('submit', function (event) {
         event.preventDefault();
+        resultText.textContent = "Processing...";
+
         const formData = new FormData(form);
+        const jsonData = {};
+        formData.forEach((value, key) => (jsonData[key] = value));
 
-        // Convert FormData to a plain object
-        const formObject = {};
-        formData.forEach((value, key) => {
-            formObject[key] = value;
-        });
-
-        try {
-            const response = await fetch('/predict', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formObject)
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const contentType = response.headers.get("content-type");
-            if (contentType && contentType.indexOf("application/json") !== -1) {
-                const data = await response.json();
-                if (data.prediction !== undefined) {
-                    resultElement.textContent = `Prediction: ${data.prediction}`;
+        fetch('/predict', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(jsonData),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.prediction) {
+                    resultText.textContent = `Predicted Final Marks: ${data.prediction}`;
                 } else {
-                    resultElement.textContent = `Error: ${data.error || 'No prediction available'}`;
+                    resultText.textContent = `Error: ${data.error}`;
                 }
-            } else {
-                console.error("Received non-JSON response:", await response.text());
-                throw new Error("Received non-JSON response from server");
-            }
-        } catch (error) {
-            console.error("Error:", error);
-            resultElement.textContent = `Error: ${error.message}`;
-        }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                resultText.textContent = 'An error occurred while processing your request.';
+            });
     });
 });

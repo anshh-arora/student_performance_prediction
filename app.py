@@ -45,8 +45,14 @@ load_model_and_scaler()
 
 def predict_new_input(age, year1_marks, year2_marks, studytime, failures):
     try:
-        new_input = np.array([[age, year1_marks, year2_marks, studytime, failures]])
-        new_input_scaled = scaler.transform(new_input)
+        # Create a DataFrame to match the original feature names
+        feature_names = ['age', 'year1_marks', 'year2_marks', 'study_time', 'failures']
+        new_input_df = pd.DataFrame([[age, year1_marks, year2_marks, studytime, failures]], columns=feature_names)
+        
+        # Scale the input using the fitted scaler
+        new_input_scaled = scaler.transform(new_input_df)
+        
+        # Make the prediction
         predicted_marks = model.predict(new_input_scaled, verbose=0)
         logger.info(f"Prediction successful: {predicted_marks[0][0]}")
         return predicted_marks[0][0]
