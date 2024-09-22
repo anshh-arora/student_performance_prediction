@@ -14,8 +14,6 @@ from tensorflow.keras.models import load_model
 import pickle
 from dotenv import load_dotenv
 
-# The rest of your code follows...
-
 # Load environment variables
 load_dotenv()
 
@@ -30,6 +28,7 @@ logger.addHandler(handler)
 
 logger.info("Starting application...")
 
+# Initialize Flask app
 app = Flask(__name__)
 CORS(app)
 
@@ -44,6 +43,8 @@ def load_model_and_scaler():
         with open('scaler.pkl', 'rb') as f:
             scaler = pickle.load(f)
         logger.info("Model and scaler loaded successfully")
+    except FileNotFoundError:
+        logger.error("Model or scaler file not found. Please check the file paths.")
     except Exception as e:
         logger.error(f"Error loading model or scaler: {e}")
 
@@ -56,6 +57,11 @@ def predict_new_input(age, year1_marks, year2_marks, studytime, failures):
         feature_names = ['age', 'year1_marks', 'year2_marks', 'study_time', 'failures']
         new_input_df = pd.DataFrame([[age, year1_marks, year2_marks, studytime, failures]], columns=feature_names)
         
+        # Check if the model and scaler are loaded
+        if model is None or scaler is None:
+            logger.error("Model or scaler is not loaded.")
+            return None
+        
         # Scale the input using the fitted scaler
         new_input_scaled = scaler.transform(new_input_df)
         
@@ -64,7 +70,7 @@ def predict_new_input(age, year1_marks, year2_marks, studytime, failures):
         logger.info(f"Prediction successful: {predicted_marks[0][0]}")
         return predicted_marks[0][0]
     except Exception as e:
-        logger.error(f"Error during prediction: {e}")
+        logger.error(f"Error during prediction: {e}", exc_info=True)
         return None
 
 @app.route('/')
@@ -79,6 +85,7 @@ def predict():
         if not data:
             return jsonify({'error': 'No JSON data received'}), 400
 
+        # Retrieve the input values from the JSON data
         name = data.get('name')
         age = int(data.get('age', 0))
         year1_marks = float(data.get('year1_marks', 0))
@@ -86,6 +93,11 @@ def predict():
         studytime = float(data.get('study_time', 0))
         failures = int(data.get('failures', 0))
 
+        # Validate the input values
+        if age <= 0 or year1_marks < 0 or year2_marks < 0 or studytime <= 0 or failures < 0:
+            return jsonify({'error': 'Invalid input values provided.'}), 400
+
+        # Make prediction
         prediction = predict_new_input(age, year1_marks, year2_marks, studytime, failures)
 
         if prediction is None:
