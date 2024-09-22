@@ -40,9 +40,8 @@ def load_model_and_scaler():
     except Exception as e:
         logger.error(f"Error loading model or scaler: {e}")
 
-@app.before_first_request
-def initialize():
-    load_model_and_scaler()
+# Load model and scaler when the application starts
+load_model_and_scaler()
 
 def predict_new_input(age, year1_marks, year2_marks, studytime, failures):
     try:
