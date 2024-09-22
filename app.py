@@ -27,15 +27,24 @@ app = Flask(__name__)
 CORS(app)
 
 # Load the trained model and scaler
-try:
-    model = load_model('final_marks_predictor_model.h5')
-    with open('scaler.pkl', 'rb') as f:
-        scaler = pickle.load(f)
-    logger.info("Model and scaler loaded successfully")
-except Exception as e:
-    logger.error(f"Error loading model or scaler: {e}")
+model = None
+scaler = None
 
-def predict_new_input(model, scaler, age, year1_marks, year2_marks, studytime, failures):
+def load_model_and_scaler():
+    global model, scaler
+    try:
+        model = load_model('final_marks_predictor_model.h5')
+        with open('scaler.pkl', 'rb') as f:
+            scaler = pickle.load(f)
+        logger.info("Model and scaler loaded successfully")
+    except Exception as e:
+        logger.error(f"Error loading model or scaler: {e}")
+
+@app.before_first_request
+def initialize():
+    load_model_and_scaler()
+
+def predict_new_input(age, year1_marks, year2_marks, studytime, failures):
     try:
         new_input = pd.DataFrame({
             'age': [age],
@@ -71,7 +80,7 @@ def predict():
         studytime = float(data.get('study_time', 0))
         failures = int(data.get('failures', 0))
 
-        prediction = predict_new_input(model, scaler, age, year1_marks, year2_marks, studytime, failures)
+        prediction = predict_new_input(age, year1_marks, year2_marks, studytime, failures)
 
         if prediction is None:
             logger.error("Prediction returned None.")
@@ -92,8 +101,8 @@ def predict():
         return jsonify({'error': 'Internal server error.'}), 500
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
+    port = int(os.environ.get('PORT', 10000))
     logger.info(f"Flask app starting on port {port}")
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(host='0.0.0.0', port=port, debug=False)
 
 logger.info("Application shutdown")
