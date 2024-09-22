@@ -1,13 +1,20 @@
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress TensorFlow logs
+
+import warnings
+warnings.filterwarnings("ignore")  # Suppress other warnings
+
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
 import logging
 from logging.handlers import RotatingFileHandler
-import os
 import numpy as np
 import pandas as pd
 from tensorflow.keras.models import load_model
 import pickle
 from dotenv import load_dotenv
+
+# The rest of your code follows...
 
 # Load environment variables
 load_dotenv()
