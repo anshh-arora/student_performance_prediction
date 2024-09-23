@@ -1,0 +1,139 @@
+2024-09-19 14:43:06,101 - app - INFO - Model and scaler loaded successfully
+2024-09-19 14:43:09,788 - app - INFO - Model and scaler loaded successfully
+2024-09-19 14:43:18,889 - app - INFO - Index page requested
+2024-09-19 14:43:30,903 - app - INFO - Received data: {'name': 'ansh', 'age': '17', 'year1_marks': '43', 'year2_marks': '64', 'study_time': '6', 'failures': '3'}
+2024-09-19 14:43:31,801 - app - INFO - Prediction successful: 55.20787048339844
+2024-09-19 14:43:31,803 - app - INFO - Prediction result: 55.21
+2024-09-22 23:44:40,861 - __main__ - INFO - Starting application...
+2024-09-22 23:44:46,893 - __main__ - INFO - Model and scaler loaded successfully
+2024-09-22 23:44:46,896 - __main__ - INFO - Flask app starting on port 5000
+2024-09-22 23:45:11,256 - __main__ - INFO - Received data: {'name': 'Ansh Arora', 'age': '19', 'year1_marks': '99', 'year2_marks': '99', 'study_time': '0', 'failures': '0'}
+2024-09-22 23:47:23,560 - __main__ - ERROR - Error during form submission: 415 Unsupported Media Type: Did not attempt to load JSON data because the request Content-Type was not 'application/json'.
+Traceback (most recent call last):
+  File "c:\Users\arora\Desktop\Ansh programs\student_performance_prediction\app.py", line 83, in predict
+    if not data:
+                 
+  File "C:\Users\arora\Desktop\Ansh programs\student_performance_prediction\myenv\Lib\site-packages\werkzeug\wrappers\request.py", line 558, in json
+    return self.get_json()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\arora\Desktop\Ansh programs\student_performance_prediction\myenv\Lib\site-packages\werkzeug\wrappers\request.py", line 604, in get_json
+    return self.on_json_loading_failed(None)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arora\Desktop\Ansh programs\student_performance_prediction\myenv\Lib\site-packages\flask\wrappers.py", line 131, in on_json_loading_failed
+    return super().on_json_loading_failed(e)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arora\Desktop\Ansh programs\student_performance_prediction\myenv\Lib\site-packages\werkzeug\wrappers\request.py", line 647, in on_json_loading_failed
+    raise UnsupportedMediaType(
+werkzeug.exceptions.UnsupportedMediaType: 415 Unsupported Media Type: Did not attempt to load JSON data because the request Content-Type was not 'application/json'.
+2024-09-22 23:47:49,705 - __main__ - INFO - Received data: {'age': 18, 'year1_marks': 85, 'year2_marks': 90, 'study_time': 3.0, 'failures': 0}
+2024-09-22 23:47:49,971 - __main__ - ERROR - Error during prediction: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- study_time
+Feature names seen at fit time, yet now missing:
+- studytime
+Traceback (most recent call last):
+  File "c:\Users\arora\Desktop\Ansh programs\student_performance_prediction\app.py", line 66, in predict_new_input
+  File "C:\Users\arora\Desktop\Ansh programs\student_performance_prediction\myenv\Lib\site-packages\sklearn\utils\_set_output.py", line 295, in wrapped
+    data_to_wrap = f(self, X, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arora\Desktop\Ansh programs\student_performance_prediction\myenv\Lib\site-packages\sklearn\preprocessing\_data.py", line 1043, in transform
+    X = self._validate_data(
+        ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arora\Desktop\Ansh programs\student_performance_prediction\myenv\Lib\site-packages\sklearn\base.py", line 608, in _validate_data
+    self._check_feature_names(X, reset=reset)
+  File "C:\Users\arora\Desktop\Ansh programs\student_performance_prediction\myenv\Lib\site-packages\sklearn\base.py", line 535, in _check_feature_names
+    raise ValueError(message)
+ValueError: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- study_time
+Feature names seen at fit time, yet now missing:
+- studytime
+
+2024-09-22 23:47:50,122 - __main__ - ERROR - Prediction returned None.
+2024-09-22 23:48:46,418 - __main__ - INFO - Received data: {'age': 18, 'year1_marks': 85, 'year2_marks': 90, 'study_time': 3.0, 'failures': 0}
+2024-09-22 23:48:46,421 - __main__ - ERROR - Error during prediction: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- study_time
+Feature names seen at fit time, yet now missing:
+- studytime
+Traceback (most recent call last):
+  File "c:\Users\arora\Desktop\Ansh programs\student_performance_prediction\app.py", line 66, in predict_new_input
+  File "C:\Users\arora\Desktop\Ansh programs\student_performance_prediction\myenv\Lib\site-packages\sklearn\utils\_set_output.py", line 295, in wrapped
+    data_to_wrap = f(self, X, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arora\Desktop\Ansh programs\student_performance_prediction\myenv\Lib\site-packages\sklearn\preprocessing\_data.py", line 1043, in transform
+    X = self._validate_data(
+        ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arora\Desktop\Ansh programs\student_performance_prediction\myenv\Lib\site-packages\sklearn\base.py", line 608, in _validate_data
+    self._check_feature_names(X, reset=reset)
+  File "C:\Users\arora\Desktop\Ansh programs\student_performance_prediction\myenv\Lib\site-packages\sklearn\base.py", line 535, in _check_feature_names
+    raise ValueError(message)
+ValueError: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- study_time
+Feature names seen at fit time, yet now missing:
+- studytime
+
+2024-09-22 23:48:46,465 - __main__ - ERROR - Prediction returned None.
+2024-09-22 23:50:08,872 - __main__ - INFO - Starting application...
+2024-09-22 23:50:12,335 - __main__ - INFO - Model and scaler loaded successfully
+2024-09-22 23:50:12,340 - __main__ - INFO - Flask app starting on port 5000
+2024-09-22 23:50:16,478 - __main__ - INFO - Received data: {'age': 18, 'year1_marks': 85, 'year2_marks': 90, 'study_time': 3.0, 'failures': 0}
+2024-09-22 23:50:16,479 - __main__ - INFO - Starting prediction...
+2024-09-22 23:50:16,481 - __main__ - DEBUG - Input values - Age: 18, Year1 Marks: 85.0, Year2 Marks: 90.0, Study Time: 0.0, Failures: 0
+2024-09-22 23:50:16,503 - __main__ - ERROR - Error during prediction: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- study_time
+Feature names seen at fit time, yet now missing:
+- studytime
+Traceback (most recent call last):
+  File "c:\Users\arora\Desktop\Ansh programs\student_performance_prediction\app.py", line 64, in predict_new_input
+    new_input_scaled = scaler.transform(new_input_df)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arora\Desktop\Ansh programs\student_performance_prediction\myenv\Lib\site-packages\sklearn\utils\_set_output.py", line 295, in wrapped
+    data_to_wrap = f(self, X, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arora\Desktop\Ansh programs\student_performance_prediction\myenv\Lib\site-packages\sklearn\preprocessing\_data.py", line 1043, in transform
+    X = self._validate_data(
+        ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arora\Desktop\Ansh programs\student_performance_prediction\myenv\Lib\site-packages\sklearn\base.py", line 608, in _validate_data
+    self._check_feature_names(X, reset=reset)
+  File "C:\Users\arora\Desktop\Ansh programs\student_performance_prediction\myenv\Lib\site-packages\sklearn\base.py", line 535, in _check_feature_names
+    raise ValueError(message)
+ValueError: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- study_time
+Feature names seen at fit time, yet now missing:
+- studytime
+
+2024-09-22 23:50:16,524 - __main__ - ERROR - Prediction returned None.
+2024-09-22 23:51:37,080 - __main__ - INFO - Received data: {'age': 18, 'year1_marks': 85, 'year2_marks': 90, 'studytime': 3.0, 'failures': 0}
+2024-09-22 23:51:37,081 - __main__ - INFO - Starting prediction...
+2024-09-22 23:51:37,084 - __main__ - DEBUG - Input values - Age: 18, Year1 Marks: 85.0, Year2 Marks: 90.0, Study Time: 3.0, Failures: 0
+2024-09-22 23:51:37,087 - __main__ - ERROR - Error during prediction: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- study_time
+Feature names seen at fit time, yet now missing:
+- studytime
+Traceback (most recent call last):
+  File "c:\Users\arora\Desktop\Ansh programs\student_performance_prediction\app.py", line 64, in predict_new_input
+    new_input_scaled = scaler.transform(new_input_df)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arora\Desktop\Ansh programs\student_performance_prediction\myenv\Lib\site-packages\sklearn\utils\_set_output.py", line 295, in wrapped
+    data_to_wrap = f(self, X, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arora\Desktop\Ansh programs\student_performance_prediction\myenv\Lib\site-packages\sklearn\preprocessing\_data.py", line 1043, in transform
+    X = self._validate_data(
+        ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arora\Desktop\Ansh programs\student_performance_prediction\myenv\Lib\site-packages\sklearn\base.py", line 608, in _validate_data
+    self._check_feature_names(X, reset=reset)
+  File "C:\Users\arora\Desktop\Ansh programs\student_performance_prediction\myenv\Lib\site-packages\sklearn\base.py", line 535, in _check_feature_names
+    raise ValueError(message)
+ValueError: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- study_time
+Feature names seen at fit time, yet now missing:
+- studytime
+
+2024-09-22 23:51:37,177 - __main__ - ERROR - Prediction returned None.
+2024-09-22 23:52:37,679 - __main__ - INFO - Received data: {'age': 18, 'year1_marks': 85, 'year2_marks': 90, 'studytime': 3.0, 'failures': 0}

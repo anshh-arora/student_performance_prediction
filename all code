@@ -29,8 +29,8 @@
                 <input type="number" id="year2_marks" name="year2_marks" min="0" max="100" autocomplete="year2_marks" required>
                 <br>
 
-                <label for="study_time">Study Time (hours):</label>
-                <input type="number" id="study_time" name="study_time" min="0" max="18" autocomplete="study_time" required>
+                <label for="studytime">Study Time (hours):</label>
+                <input type="number" id="studytime" name="studytime" min="0" max="18" autocomplete="studytime" required>
                 <br>
 
                 <label for="failures">Number of Failures:</label>
@@ -50,161 +50,55 @@
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
-/* Base Styles */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
-    margin: 0;
-    padding: 20px;
-    box-sizing: border-box;
-}
 
-/* Title Styling */
-#title {
-    text-align: center;
-    color: #333;
-    margin-bottom: 30px;
-}
-
-#title h1 {
-    font-size: 2rem;
-}
-
-/* Form Container */
-#form {
-    display: flex;
-    justify-content: center;
-}
-
-#form-container {
-    background-color: #fff;
-    padding: 20px 30px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    max-width: 400px;
-    width: 100%;
-}
-
-/* Form Element Styling */
-label {
-    display: block;
-    margin-bottom: 8px;
-    color: #333;
-    font-weight: bold;
-}
-
-input[type="text"], input[type="number"] {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1rem;
-    box-sizing: border-box;
-}
-
-input[type="text"]:focus, input[type="number"]:focus {
-    border-color: #007bff;
-    outline: none;
-}
-
-/* Button Styling */
-#submit-button {
-    width: 100%;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px;
-    font-size: 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#submit-button:hover {
-    background-color: #0056b3;
-}
-
-/* Result Styling */
-#result {
-    margin-top: 20px;
-    text-align: center;
-}
-
-/* Responsive Adjustments */
-@media (max-width: 480px) {
-    #form-container {
-        padding: 15px;
-    }
-
-    #title h1 {
-        font-size: 1.5rem;
-    }
-
-    input[type="text"], input[type="number"], #submit-button {
-        font-size: 0.9rem;
-    }
-
-    #submit-button {
-        padding: 8px;
-    }
-}
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('prediction-form');
-    const resultElement = document.getElementById('prediction-result');
+    const resultDiv = document.getElementById('result');
+    const resultText = document.getElementById('prediction-result');
 
-    form.addEventListener('submit', async (event) => {
+    form.addEventListener('submit', function (event) {
         event.preventDefault();
+        resultText.textContent = "Processing...";
+
         const formData = new FormData(form);
+        const jsonData = {};
+        formData.forEach((value, key) => (jsonData[key] = value));
 
-        // Convert FormData to a plain object
-        const formObject = {};
-        formData.forEach((value, key) => {
-            formObject[key] = value;
-        });
-
-        try {
-            const response = await fetch('/predict', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formObject)
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const contentType = response.headers.get("content-type");
-            if (contentType && contentType.indexOf("application/json") !== -1) {
-                const data = await response.json();
-                if (data.prediction !== undefined) {
-                    resultElement.textContent = `Prediction: ${data.prediction}`;
+        fetch('/predict', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(jsonData),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.prediction) {
+                    resultText.textContent = `Predicted Final Marks: ${data.prediction}`;
                 } else {
-                    resultElement.textContent = `Error: ${data.error || 'No prediction available'}`;
+                    resultText.textContent = `Error: ${data.error}`;
                 }
-            } else {
-                console.error("Received non-JSON response:", await response.text());
-                throw new Error("Received non-JSON response from server");
-            }
-        } catch (error) {
-            console.error("Error:", error);
-            resultElement.textContent = `Error: ${error.message}`;
-        }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                resultText.textContent = 'An error occurred while processing your request.';
+            });
     });
 });
 
-from flask import Flask, render_template, request, jsonify
-from flask_cors import CORS
+import os
+import warnings
 import logging
 from logging.handlers import RotatingFileHandler
-import os
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 import numpy as np
 import pandas as pd
 from tensorflow.keras.models import load_model
 import pickle
 from dotenv import load_dotenv
+
+# Suppress TensorFlow and other warnings
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+warnings.filterwarnings("ignore")
 
 # Load environment variables
 load_dotenv()
@@ -242,18 +136,30 @@ load_model_and_scaler()
 
 def predict_new_input(age, year1_marks, year2_marks, studytime, failures):
     try:
-        new_input = np.array([[age, year1_marks, year2_marks, studytime, failures]])
-        new_input_scaled = scaler.transform(new_input)
+        logger.info("Starting prediction...")
+        logger.debug(f"Input values - Age: {age}, Year1 Marks: {year1_marks}, Year2 Marks: {year2_marks}, Study Time: {studytime}, Failures: {failures}")
+
+        # Create a DataFrame to match the original feature names
+        feature_names = ['age', 'year1_marks', 'year2_marks', 'studytime', 'failures']
+        new_input_df = pd.DataFrame([[age, year1_marks, year2_marks, studytime, failures]], columns=feature_names)
+
+        if model is None or scaler is None:
+            logger.error("Model or scaler is not loaded.")
+            return None
+        
+        new_input_scaled = scaler.transform(new_input_df)
+        logger.debug(f"Scaled input: {new_input_scaled}")
+
         predicted_marks = model.predict(new_input_scaled, verbose=0)
         logger.info(f"Prediction successful: {predicted_marks[0][0]}")
         return predicted_marks[0][0]
     except Exception as e:
-        logger.error(f"Error during prediction: {e}")
+        logger.error(f"Error during prediction: {e}", exc_info=True)
         return None
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return "Welcome to the Marks Prediction API!"
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -263,11 +169,11 @@ def predict():
         if not data:
             return jsonify({'error': 'No JSON data received'}), 400
 
-        name = data.get('name')
+        # Extract values
         age = int(data.get('age', 0))
         year1_marks = float(data.get('year1_marks', 0))
         year2_marks = float(data.get('year2_marks', 0))
-        studytime = float(data.get('study_time', 0))
+        studytime = float(data.get('studytime', 0))  # Changed from 'study_time' to 'studytime'
         failures = int(data.get('failures', 0))
 
         prediction = predict_new_input(age, year1_marks, year2_marks, studytime, failures)
@@ -279,19 +185,26 @@ def predict():
         rounded_prediction = round(float(prediction), 2)
         logger.info(f"Prediction result: {rounded_prediction}")
         return jsonify({'prediction': rounded_prediction})
-    
-    except KeyError as ke:
-        logger.error(f"KeyError: {ke}")
-        return jsonify({'error': f'Missing required field: {ke}'}), 400
-    except ValueError as ve:
-        logger.error(f"ValueError: {ve}")
-        return jsonify({'error': 'Invalid input. Please ensure all fields contain correct values.'}), 400
+
     except Exception as e:
-        logger.error(f"Error during form submission: {e}", exc_info=True)
+        logger.error(f"Error during prediction: {e}", exc_info=True)
         return jsonify({'error': 'Internal server error.'}), 500
 
+@app.route('/test-prediction', methods=['GET'])
+def test_prediction():
+    # Sample data for testing
+    sample_data = {
+        'age': 18,
+        'year1_marks': 85,
+        'year2_marks': 90,
+        'studytime': 3.0,
+        'failures': 0
+    }
+    prediction = predict_new_input(**sample_data)
+    return jsonify({'sample_prediction': prediction})
+
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 10000))
+    port = int(os.environ.get('PORT', 5000))
     logger.info(f"Flask app starting on port {port}")
     app.run(host='0.0.0.0', port=port, debug=False)
 

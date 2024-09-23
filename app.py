@@ -1,18 +1,18 @@
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress TensorFlow logs
-
 import warnings
-warnings.filterwarnings("ignore")  # Suppress other warnings
-
-from flask import Flask, render_template, request, jsonify
-from flask_cors import CORS
 import logging
 from logging.handlers import RotatingFileHandler
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 import numpy as np
 import pandas as pd
 from tensorflow.keras.models import load_model
 import pickle
 from dotenv import load_dotenv
+
+# Suppress TensorFlow and other warnings
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+warnings.filterwarnings("ignore")
 
 # Load environment variables
 load_dotenv()
@@ -28,7 +28,6 @@ logger.addHandler(handler)
 
 logger.info("Starting application...")
 
-# Initialize Flask app
 app = Flask(__name__)
 CORS(app)
 
@@ -43,8 +42,6 @@ def load_model_and_scaler():
         with open('scaler.pkl', 'rb') as f:
             scaler = pickle.load(f)
         logger.info("Model and scaler loaded successfully")
-    except FileNotFoundError:
-        logger.error("Model or scaler file not found. Please check the file paths.")
     except Exception as e:
         logger.error(f"Error loading model or scaler: {e}")
 
@@ -53,19 +50,20 @@ load_model_and_scaler()
 
 def predict_new_input(age, year1_marks, year2_marks, studytime, failures):
     try:
+        logger.info("Starting prediction...")
+        logger.debug(f"Input values - Age: {age}, Year1 Marks: {year1_marks}, Year2 Marks: {year2_marks}, Study Time: {studytime}, Failures: {failures}")
+
         # Create a DataFrame to match the original feature names
-        feature_names = ['age', 'year1_marks', 'year2_marks', 'study_time', 'failures']
+        feature_names = ['age', 'year1_marks', 'year2_marks', 'studytime', 'failures']
         new_input_df = pd.DataFrame([[age, year1_marks, year2_marks, studytime, failures]], columns=feature_names)
-        
-        # Check if the model and scaler are loaded
+
         if model is None or scaler is None:
             logger.error("Model or scaler is not loaded.")
             return None
         
-        # Scale the input using the fitted scaler
         new_input_scaled = scaler.transform(new_input_df)
-        
-        # Make the prediction
+        logger.debug(f"Scaled input: {new_input_scaled}")
+
         predicted_marks = model.predict(new_input_scaled, verbose=0)
         logger.info(f"Prediction successful: {predicted_marks[0][0]}")
         return predicted_marks[0][0]
@@ -75,7 +73,7 @@ def predict_new_input(age, year1_marks, year2_marks, studytime, failures):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return "Welcome to the Marks Prediction API!"
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -85,19 +83,13 @@ def predict():
         if not data:
             return jsonify({'error': 'No JSON data received'}), 400
 
-        # Retrieve the input values from the JSON data
-        name = data.get('name')
+        # Extract values
         age = int(data.get('age', 0))
         year1_marks = float(data.get('year1_marks', 0))
         year2_marks = float(data.get('year2_marks', 0))
-        studytime = float(data.get('study_time', 0))
+        studytime = float(data.get('studytime', 0))  # Changed from 'study_time' to 'studytime'
         failures = int(data.get('failures', 0))
 
-        # Validate the input values
-        if age <= 0 or year1_marks < 0 or year2_marks < 0 or studytime <= 0 or failures < 0:
-            return jsonify({'error': 'Invalid input values provided.'}), 400
-
-        # Make prediction
         prediction = predict_new_input(age, year1_marks, year2_marks, studytime, failures)
 
         if prediction is None:
@@ -107,19 +99,26 @@ def predict():
         rounded_prediction = round(float(prediction), 2)
         logger.info(f"Prediction result: {rounded_prediction}")
         return jsonify({'prediction': rounded_prediction})
-    
-    except KeyError as ke:
-        logger.error(f"KeyError: {ke}")
-        return jsonify({'error': f'Missing required field: {ke}'}), 400
-    except ValueError as ve:
-        logger.error(f"ValueError: {ve}")
-        return jsonify({'error': 'Invalid input. Please ensure all fields contain correct values.'}), 400
+
     except Exception as e:
-        logger.error(f"Error during form submission: {e}", exc_info=True)
+        logger.error(f"Error during prediction: {e}", exc_info=True)
         return jsonify({'error': 'Internal server error.'}), 500
 
+@app.route('/test-prediction', methods=['GET'])
+def test_prediction():
+    # Sample data for testing
+    sample_data = {
+        'age': 18,
+        'year1_marks': 85,
+        'year2_marks': 90,
+        'studytime': 3.0,
+        'failures': 0
+    }
+    prediction = predict_new_input(**sample_data)
+    return jsonify({'sample_prediction': prediction})
+
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 10000))
+    port = int(os.environ.get('PORT', 5000))
     logger.info(f"Flask app starting on port {port}")
     app.run(host='0.0.0.0', port=port, debug=False)
 
