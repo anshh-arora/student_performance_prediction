@@ -2,7 +2,7 @@ import os
 import warnings
 import logging
 from logging.handlers import RotatingFileHandler
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import numpy as np
 import pandas as pd
@@ -53,7 +53,6 @@ def predict_new_input(age, year1_marks, year2_marks, studytime, failures):
         logger.info("Starting prediction...")
         logger.debug(f"Input values - Age: {age}, Year1 Marks: {year1_marks}, Year2 Marks: {year2_marks}, Study Time: {studytime}, Failures: {failures}")
 
-        # Create a DataFrame to match the original feature names
         feature_names = ['age', 'year1_marks', 'year2_marks', 'studytime', 'failures']
         new_input_df = pd.DataFrame([[age, year1_marks, year2_marks, studytime, failures]], columns=feature_names)
 
@@ -73,7 +72,7 @@ def predict_new_input(age, year1_marks, year2_marks, studytime, failures):
 
 @app.route('/')
 def index():
-    return "Welcome to the Marks Prediction API!"
+    return render_template('index.html')
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -83,11 +82,10 @@ def predict():
         if not data:
             return jsonify({'error': 'No JSON data received'}), 400
 
-        # Extract values
         age = int(data.get('age', 0))
         year1_marks = float(data.get('year1_marks', 0))
         year2_marks = float(data.get('year2_marks', 0))
-        studytime = float(data.get('studytime', 0))  # Changed from 'study_time' to 'studytime'
+        studytime = float(data.get('studytime', 0))
         failures = int(data.get('failures', 0))
 
         prediction = predict_new_input(age, year1_marks, year2_marks, studytime, failures)
@@ -104,22 +102,7 @@ def predict():
         logger.error(f"Error during prediction: {e}", exc_info=True)
         return jsonify({'error': 'Internal server error.'}), 500
 
-@app.route('/test-prediction', methods=['GET'])
-def test_prediction():
-    # Sample data for testing
-    sample_data = {
-        'age': 18,
-        'year1_marks': 85,
-        'year2_marks': 90,
-        'studytime': 3.0,
-        'failures': 0
-    }
-    prediction = predict_new_input(**sample_data)
-    return jsonify({'sample_prediction': prediction})
-
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     logger.info(f"Flask app starting on port {port}")
-    app.run(host='0.0.0.0', port=port, debug=False)
-
-logger.info("Application shutdown")
+    app.run(host='0.0.0.0', port=port, debug=True)

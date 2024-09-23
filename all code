@@ -12,7 +12,7 @@
     </div>
     <div id="form">
         <div id="form-container">
-            <form id="prediction-form" method="post" action="/predict">
+            <form id="prediction-form">
                 <label for="name">Name:</label>
                 <input type="text" id="name" name="name" autocomplete="name" required>
                 <br>
@@ -38,18 +38,77 @@
                 <br>
 
                 <button type="submit" id="submit-button">Predict</button>
-
-                <!-- Display Prediction Result -->
-                <div id="result">
-                    <p id="prediction-result"></p>
-                </div>
             </form>
+
+            <!-- Display Prediction Result -->
+            <div id="result">
+                <p id="prediction-result"></p>
+            </div>
         </div>
     </div>
-
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+#title {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#form-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 300px;
+}
+
+form label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+form input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+#submit-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#submit-button:hover {
+    background-color: #45a049;
+}
+
+#result {
+    margin-top: 20px;
+    text-align: center;
+}
 
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('prediction-form');
@@ -62,14 +121,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const formData = new FormData(form);
         const jsonData = {};
-        formData.forEach((value, key) => (jsonData[key] = value));
+        formData.forEach((value, key) => {
+            jsonData[key] = key === 'name' ? value : Number(value);
+        });
 
         fetch('/predict', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(jsonData),
         })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.prediction) {
                     resultText.textContent = `Predicted Final Marks: ${data.prediction}`;
@@ -88,7 +154,7 @@ import os
 import warnings
 import logging
 from logging.handlers import RotatingFileHandler
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import numpy as np
 import pandas as pd
@@ -139,7 +205,6 @@ def predict_new_input(age, year1_marks, year2_marks, studytime, failures):
         logger.info("Starting prediction...")
         logger.debug(f"Input values - Age: {age}, Year1 Marks: {year1_marks}, Year2 Marks: {year2_marks}, Study Time: {studytime}, Failures: {failures}")
 
-        # Create a DataFrame to match the original feature names
         feature_names = ['age', 'year1_marks', 'year2_marks', 'studytime', 'failures']
         new_input_df = pd.DataFrame([[age, year1_marks, year2_marks, studytime, failures]], columns=feature_names)
 
@@ -159,7 +224,7 @@ def predict_new_input(age, year1_marks, year2_marks, studytime, failures):
 
 @app.route('/')
 def index():
-    return "Welcome to the Marks Prediction API!"
+    return render_template('index.html')
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -169,11 +234,10 @@ def predict():
         if not data:
             return jsonify({'error': 'No JSON data received'}), 400
 
-        # Extract values
         age = int(data.get('age', 0))
         year1_marks = float(data.get('year1_marks', 0))
         year2_marks = float(data.get('year2_marks', 0))
-        studytime = float(data.get('studytime', 0))  # Changed from 'study_time' to 'studytime'
+        studytime = float(data.get('studytime', 0))
         failures = int(data.get('failures', 0))
 
         prediction = predict_new_input(age, year1_marks, year2_marks, studytime, failures)
@@ -190,22 +254,7 @@ def predict():
         logger.error(f"Error during prediction: {e}", exc_info=True)
         return jsonify({'error': 'Internal server error.'}), 500
 
-@app.route('/test-prediction', methods=['GET'])
-def test_prediction():
-    # Sample data for testing
-    sample_data = {
-        'age': 18,
-        'year1_marks': 85,
-        'year2_marks': 90,
-        'studytime': 3.0,
-        'failures': 0
-    }
-    prediction = predict_new_input(**sample_data)
-    return jsonify({'sample_prediction': prediction})
-
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     logger.info(f"Flask app starting on port {port}")
-    app.run(host='0.0.0.0', port=port, debug=False)
-
-logger.info("Application shutdown")
+    app.run(host='0.0.0.0', port=port, debug=True)

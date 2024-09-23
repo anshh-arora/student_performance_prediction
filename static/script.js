@@ -9,14 +9,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const formData = new FormData(form);
         const jsonData = {};
-        formData.forEach((value, key) => (jsonData[key] = value));
+        formData.forEach((value, key) => {
+            jsonData[key] = key === 'name' ? value : Number(value);
+        });
 
         fetch('/predict', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(jsonData),
         })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.prediction) {
                     resultText.textContent = `Predicted Final Marks: ${data.prediction}`;

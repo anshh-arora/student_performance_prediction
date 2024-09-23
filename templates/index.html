@@ -12,7 +12,7 @@
     </div>
     <div id="form">
         <div id="form-container">
-            <form id="prediction-form" method="post" action="/predict">
+            <form id="prediction-form">
                 <label for="name">Name:</label>
                 <input type="text" id="name" name="name" autocomplete="name" required>
                 <br>
@@ -38,15 +38,14 @@
                 <br>
 
                 <button type="submit" id="submit-button">Predict</button>
-
-                <!-- Display Prediction Result -->
-                <div id="result">
-                    <p id="prediction-result"></p>
-                </div>
             </form>
+
+            <!-- Display Prediction Result -->
+            <div id="result">
+                <p id="prediction-result"></p>
+            </div>
         </div>
     </div>
-
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

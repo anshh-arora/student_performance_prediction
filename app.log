@@ -64,3 +64,54 @@ Feature names seen at fit time, yet now missing:
 2024-09-23 13:09:30,943 - __main__ - DEBUG - Scaled input: [[ 1.31192398 22.60092846 24.05207459  1.46676818  0.        ]]
 2024-09-23 13:09:31,275 - __main__ - INFO - Prediction successful: 76.22734832763672
 2024-09-23 13:09:31,275 - __main__ - INFO - Prediction result: 76.23
+2024-09-23 13:23:38,397 - __main__ - INFO - Starting application...
+2024-09-23 13:23:41,267 - __main__ - INFO - Model and scaler loaded successfully
+2024-09-23 13:23:41,270 - __main__ - INFO - Flask app starting on port 5000
+2024-09-23 13:23:47,630 - __main__ - INFO - Starting application...
+2024-09-23 13:23:48,766 - __main__ - INFO - Model and scaler loaded successfully
+2024-09-23 13:23:48,768 - __main__ - INFO - Flask app starting on port 5000
+2024-09-23 13:25:11,320 - __main__ - INFO - Starting application...
+2024-09-23 13:25:12,404 - __main__ - INFO - Model and scaler loaded successfully
+2024-09-23 13:25:12,407 - __main__ - INFO - Flask app starting on port 5000
+2024-09-23 13:27:37,464 - __main__ - INFO - Starting application...
+2024-09-23 13:27:38,526 - __main__ - INFO - Model and scaler loaded successfully
+2024-09-23 13:27:38,528 - __main__ - INFO - Flask app starting on port 5000
+2024-09-23 13:27:50,020 - __main__ - INFO - Received data: {'age': 18, 'year1_marks': 85, 'year2_marks': 90, 'studytime': 3.0, 'failures': 0}
+2024-09-23 13:27:50,030 - __main__ - INFO - Starting prediction...
+2024-09-23 13:27:50,031 - __main__ - DEBUG - Input values - Age: 18, Year1 Marks: 85.0, Year2 Marks: 90.0, Study Time: 3.0, Failures: 0
+2024-09-23 13:27:50,202 - __main__ - DEBUG - Scaled input: [[ 1.31192398 22.60092846 24.05207459  1.46676818  0.        ]]
+2024-09-23 13:27:50,787 - __main__ - INFO - Prediction successful: 76.22734832763672
+2024-09-23 13:27:50,788 - __main__ - INFO - Prediction result: 76.23
+2024-09-23 13:27:52,640 - __main__ - INFO - Received data: {'age': 18, 'year1_marks': 85, 'year2_marks': 90, 'studytime': 3.0, 'failures': 0}
+2024-09-23 13:27:52,641 - __main__ - INFO - Starting prediction...
+2024-09-23 13:27:52,643 - __main__ - DEBUG - Input values - Age: 18, Year1 Marks: 85.0, Year2 Marks: 90.0, Study Time: 3.0, Failures: 0
+2024-09-23 13:27:52,648 - __main__ - DEBUG - Scaled input: [[ 1.31192398 22.60092846 24.05207459  1.46676818  0.        ]]
+2024-09-23 13:27:52,772 - __main__ - INFO - Prediction successful: 76.22734832763672
+2024-09-23 13:27:52,772 - __main__ - INFO - Prediction result: 76.23
+2024-09-23 13:28:00,311 - __main__ - INFO - Received data: {'age': 19, 'year1_marks': 8, 'year2_marks': 90, 'studytime': 3.0, 'failures': 0}
+2024-09-23 13:28:00,312 - __main__ - INFO - Starting prediction...
+2024-09-23 13:28:00,313 - __main__ - DEBUG - Input values - Age: 19, Year1 Marks: 8.0, Year2 Marks: 90.0, Study Time: 3.0, Failures: 0
+2024-09-23 13:28:00,314 - __main__ - DEBUG - Scaled input: [[ 2.18173438 -1.1020695  24.05207459  1.46676818  0.        ]]
+2024-09-23 13:28:00,391 - __main__ - INFO - Prediction successful: 90.89672088623047
+2024-09-23 13:28:00,392 - __main__ - INFO - Prediction result: 90.9
+2024-09-23 13:28:08,173 - __main__ - INFO - Received data: {'age': 19, 'year1_marks': 8, 'year2_marks': 9, 'studytime': 3.0, 'failures': 0}
+2024-09-23 13:28:08,175 - __main__ - INFO - Starting prediction...
+2024-09-23 13:28:08,175 - __main__ - DEBUG - Input values - Age: 19, Year1 Marks: 8.0, Year2 Marks: 9.0, Study Time: 3.0, Failures: 0
+2024-09-23 13:28:08,178 - __main__ - DEBUG - Scaled input: [[ 2.18173438 -1.1020695  -0.82639765  1.46676818  0.        ]]
+2024-09-23 13:28:08,255 - __main__ - INFO - Prediction successful: 8.264747619628906
+2024-09-23 13:28:08,256 - __main__ - INFO - Prediction result: 8.26
+2024-09-23 13:30:58,081 - __main__ - INFO - Starting application...
+2024-09-23 13:30:59,029 - __main__ - INFO - Model and scaler loaded successfully
+2024-09-23 13:30:59,031 - __main__ - INFO - Flask app starting on port 5000
+2024-09-23 13:44:27,489 - __main__ - INFO - Starting application...
+2024-09-23 13:44:28,927 - __main__ - INFO - Model and scaler loaded successfully
+2024-09-23 13:44:28,928 - __main__ - INFO - Flask app starting on port 5000
+2024-09-23 13:44:35,254 - __main__ - INFO - Starting application...
+2024-09-23 13:44:36,722 - __main__ - INFO - Model and scaler loaded successfully
+2024-09-23 13:44:36,724 - __main__ - INFO - Flask app starting on port 5000
+2024-09-23 13:44:56,545 - __main__ - INFO - Received data: {'name': 'ansh', 'age': 19, 'year1_marks': 99, 'year2_marks': 99, 'studytime': 0, 'failures': 0}
+2024-09-23 13:44:56,546 - __main__ - INFO - Starting prediction...
+2024-09-23 13:44:56,548 - __main__ - DEBUG - Input values - Age: 19, Year1 Marks: 99.0, Year2 Marks: 99.0, Study Time: 0.0, Failures: 0
+2024-09-23 13:44:56,582 - __main__ - DEBUG - Scaled input: [[ 2.18173438 26.91056446 26.81634928 -2.79235011  0.        ]]
+2024-09-23 13:44:57,004 - __main__ - INFO - Prediction successful: 83.0030746459961
+2024-09-23 13:44:57,005 - __main__ - INFO - Prediction result: 83.0
