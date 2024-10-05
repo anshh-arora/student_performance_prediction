@@ -1,6 +1,6 @@
 # Final Marks Predictor
 
-![Final Marks Predictor](https://via.placeholder.com/800x400.png?text=Final+Marks+Predictor+Demo)
+![Final Marks Predictor](https://github.com/anshh-arora/student_performance_prediction/blob/main/Project%20Image)
 
 ## Project Overview
 
@@ -50,7 +50,7 @@ final-marks-predictor/
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/final-marks-predictor.git
+   git clone https://github.com/anshh-arora/student_performance_prediction.git
    ```
 
 2. Navigate to the project directory:
@@ -114,8 +114,8 @@ final-marks-predictor/
 5. **Scalability**: Can be easily adapted to different educational contexts and datasets.
 
 ## Demo Video
-
-[![Final Marks Predictor Demo](https://img.youtube.com/vi/YOUTUBE_VIDEO_ID_HERE/0.jpg)](https://www.youtube.com/watch?v=YOUTUBE_VIDEO_ID_HERE)
+[![Final Marks Predictor Demo](https://github.com/anshh-arora/student_performance_prediction/blob/main/Testing%20vedio.mp4)
+[![Final Marks Predictor Demo](https://github.com/anshh-arora/student_performance_prediction/blob/main/Testingvedio-ezgif.com-video-to-gif-converter.gif)
 
 Click the image above to watch a demonstration of the Final Marks Predictor in action.
 
@@ -132,12 +132,10 @@ We welcome contributions to improve the Final Marks Predictor! Here's how you ca
 
 Please ensure your code adheres to our coding standards and include tests for new features.
 
-## Contact
+## Contact Information
+For any questions or feedback, feel free to reach out:
 
-Your Name - [@your_twitter](https://twitter.com/your_twitter) - email@example.com
+- **Email**: [ansharora.cs@gmail.com](mailto:ansharora.cs@gmail.com)
+- **LinkedIn**: [Connect with me on LinkedIn](https://www.linkedin.com/in/ansh-arora-data-scientist/)
+- **Kaggle**: [Follow me on Kaggle](https://www.kaggle.com/ansh1529)
 
-Project Link: [https://github.com/yourusername/final-marks-predictor](https://github.com/yourusername/final-marks-predictor)
-
----
-
-Thank you for your interest in the Final Marks Predictor project. We look forward to your contributions and feedback!
